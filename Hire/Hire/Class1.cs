@@ -177,17 +177,17 @@ namespace Hire
         private GUIStyle _scrollviewStyle; // style of the whole scrollview
         private GUIStyle _nameStyle; // style used for kerbal names
         private GUIStyle _listItemEntryStyle; // style used for background of each kerbal entry
-        private float KStupidity = 50;
-        private float KCourage = 50;
-        private bool KFearless = false;
-        private int KCareer = 0;
+        private static float KStupidity = 50;
+        private static float KCourage = 50;
+        private static bool KFearless = false;
+        private static int KCareer = 0;
         private string[] KCareerStrings = { "Pilot", "Scientist", "Engineer" };
-        private int KLevel = 0;
+        private static int KLevel = 0;
         private string[] KLevelStringsZero = new string[1] { "Level 0" };
         private string[] KLevelStringsOne = new string[2] { "Level 0", "Level 1" };
         private string[] KLevelStringsTwo = new string[3] { "Level 0", "Level 1", "Level 2" };
         private string[] KLevelStringsAll = new string[6] { "Level 0", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5" };
-        private int KGender = 0;
+        private static int KGender = 0;
         private GUIContent KMale = new GUIContent("Male", AssetBase.GetTexture("kerbalicon_recruit"));
         private GUIContent KFemale = new GUIContent("Female", AssetBase.GetTexture("kerbalicon_recruit_female"));
         Color basecolor = GUI.color;
@@ -329,9 +329,9 @@ namespace Hire
                 newKerb.experienceLevel = 5;
                 Debug.Log("KSI :: Level set to 5 - Non-Career Mode default.");
             }
-            
-            // Canvas.ForceUpdateCanvases();
-            // GameEvents.onGUIAstronautComplexSpawn.Fire();  // This fails under the new UI --
+
+
+
             // Refreshes the AC so that new kerbal shows on the available roster.
 
 
@@ -342,7 +342,8 @@ namespace Hire
                 Debug.Log("KSI :: Total Funds removed " + costMath());
             }
             Debug.Log("KSI :: Hiring Function Completed.");
-
+            GameEvents.onGUIAstronautComplexDespawn.Fire();  // This fails under the new UI --
+            GameEvents.onGUIAstronautComplexSpawn.Fire();
         }
 
 
