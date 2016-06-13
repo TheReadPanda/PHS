@@ -30,14 +30,12 @@ namespace Hire
 
                 // There isn't really any specific component we can look for to make it easier
                 // without also making things less clear so a long transform path it is
-                // var listAndScrollbar = prefab.transform.Find("RootCanvas/AstronautComplex anchor/GameObject/bg and aspectFitter/CrewAssignmentDialog/VL/ListAndScrollbar");
                 var testVL = prefab.transform.Find("RootCanvas/AstronautComplex anchor/GameObject/bg and aspectFitter/CrewAssignmentDialog/VL");
 
                 if (testVL == null) throw new Exception("Couldn't find testVL Transform");
 
-                // temporarily detach Panel/scrolllist_applicants
+
                 // we can't just delete it (or set it inactive apparently) or AstronautComplex will throw an exception
-                //
                 // we CAN, however, delete all the UI bits from it
                 var panel = testVL.transform.Find("ListAndScrollbar");
                 panel.SetParent(null);
@@ -49,10 +47,9 @@ namespace Hire
                 panel.GetComponentsInChildren<VerticalLayoutGroup>(true).ToList().ForEach(Destroy);
                 panel.GetComponentsInChildren<ContentSizeFitter>(true).ToList().ForEach(Destroy);
 
-                // destroy all the other children
+                // Hide all the other children
                 foreach (Transform ch in testVL.transform)
                     ch.gameObject.SetActive(false);
-                // Destroy(ch.gameObject);
 
                 // reattach panel - AstronautComplex needs something inside here for something but now it won't be
                 // rendering anything
@@ -126,7 +123,6 @@ namespace Hire
 
             GetComponent<RectTransform>().GetWorldCorners(vectors);
 
-
             for (int i = 0; i < 4; ++i)
                 vectors[i] = camera.WorldToScreenPoint(vectors[i]);
 
@@ -170,9 +166,6 @@ namespace Hire
         private Rect _areaRect = new Rect(-500f, -500f, 200f, 200f);
         private Vector2 _guiScalar = Vector2.one;
         private Vector2 _guiPivot = Vector2.zero;
-        private Vector2 _scrollbar = Vector2.zero;
-        private readonly Texture2D _portraitMale = AssetBase.GetTexture("kerbalicon_recruit");
-        private readonly Texture2D _portraitFemale = AssetBase.GetTexture("kerbalicon_recruit_female");
         private GUIStyle _backgroundStyle; // the background of the whole area our GUI will cover
         private GUIStyle _scrollviewStyle; // style of the whole scrollview
         private GUIStyle _nameStyle; // style used for kerbal names
@@ -183,6 +176,7 @@ namespace Hire
         private static int KCareer = 0;
         private string[] KCareerStrings = { "Pilot", "Scientist", "Engineer" };
         private static int KLevel = 0;
+        private float Krep = Reputation.CurrentRep;
         private string[] KLevelStringsZero = new string[1] { "Level 0" };
         private string[] KLevelStringsOne = new string[2] { "Level 0", "Level 1" };
         private string[] KLevelStringsTwo = new string[3] { "Level 0", "Level 1", "Level 2" };
@@ -190,6 +184,7 @@ namespace Hire
         private static int KGender = 0;
         private GUIContent KMale = new GUIContent("Male", AssetBase.GetTexture("kerbalicon_recruit"));
         private GUIContent KFemale = new GUIContent("Female", AssetBase.GetTexture("kerbalicon_recruit_female"));
+        private GUIContent KGRandom = new GUIContent("Random", "When this option is selected the kerbal might be male or female");
         Color basecolor = GUI.color;
         private float ACLevel = 0;
         private double KDead;
@@ -263,25 +258,27 @@ namespace Hire
         {
 
             ProtoCrewMember newKerb = HighLogic.CurrentGame.CrewRoster.GetNewKerbal(ProtoCrewMember.KerbalType.Crew);
-            int loopcount = 0;
-            ProtoCrewMember.Gender gender = (KGender == 0) ? ProtoCrewMember.Gender.Male : ProtoCrewMember.Gender.Female;
+
+            switch (KGender) // Sets gender
+            {
+                case 0: newKerb.gender = ProtoCrewMember.Gender.Male; break;
+                case 1: newKerb.gender = ProtoCrewMember.Gender.Female; break;
+                case 2: break;
+                default: break;
+            }
             string career = "";
-            switch (KCareer)
+            switch (KCareer) // Sets career
             {
                 case 0: career = "Pilot"; break;
                 case 1: career = "Scientist"; break;
                 case 2: career = "Engineer"; break;
                 default: break;// throw an error?
             }
-            while ((newKerb.experienceTrait.Title != career) || (newKerb.gender != gender))  // Just manually set career as selected now
-            {
-                HighLogic.CurrentGame.CrewRoster.Remove(newKerb);
-                newKerb = HighLogic.CurrentGame.CrewRoster.GetNewKerbal(ProtoCrewMember.KerbalType.Crew);
-                loopcount++;
-            }
+            // Sets the kerbal's career based on the KCareer switch.
+            KerbalRoster.SetExperienceTrait(newKerb, career);
 
             Debug.Log("KSI :: KIA MIA Stat is: " + KDead);
-            Debug.Log("KSI :: " + newKerb.experienceTrait.TypeName + " " + newKerb.name + " has been created in: " + loopcount.ToString() + " loops.");
+            // Debug.Log("KSI :: " + newKerb.experienceTrait.TypeName + " " + newKerb.name + " has been created in: " + loopcount.ToString() + " loops.");
             newKerb.rosterStatus = ProtoCrewMember.RosterStatus.Available;
             newKerb.experience = 0;
             newKerb.experienceLevel = 0;
@@ -429,7 +426,7 @@ namespace Hire
         {
             GUI.skin = HighLogic.Skin;
             var roster = HighLogic.CurrentGame.CrewRoster;
-            GUIContent[] KGendArray = new GUIContent[2] { KMale, KFemale };
+            GUIContent[] KGendArray = new GUIContent[3] { KMale, KFemale, KGRandom};
             if (HighLogic.CurrentGame.Mode == Game.Modes.SANDBOX)
             {
                 hasKredits = false;
@@ -448,7 +445,7 @@ namespace Hire
 
             GUILayout.BeginArea(_areaRect);
             {
-                GUILayout.Label("Kerbal Science Institute: Placement Services"); // Testing Renaming Label Works
+                GUILayout.Label("The Read Panda Placement Services Center"); // Testing Renaming Label Works
 
                 // Gender selection 
                 GUILayout.BeginHorizontal("box");
@@ -493,7 +490,6 @@ namespace Hire
                     GUILayout.BeginHorizontal("window");
                     GUILayout.BeginVertical();
                     GUILayout.FlexibleSpace();
-
                     if (costMath() <= Funding.Instance.Funds)
                     {
                         GUILayout.Label("Cost: " + costMath(), HighLogic.Skin.textField);
@@ -508,7 +504,6 @@ namespace Hire
                     GUILayout.EndVertical();
                     GUILayout.EndHorizontal();
                 }
-
                 GUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
 
