@@ -170,6 +170,9 @@ namespace Hire
         private GUIStyle _scrollviewStyle; // style of the whole scrollview
         private GUIStyle _nameStyle; // style used for kerbal names
         private GUIStyle _listItemEntryStyle; // style used for background of each kerbal entry
+        private float KBulk = 1;
+        private int KBulki = 1;
+        private int crewWeCanHire = 10;
         private static float KStupidity = 50;
         private static float KCourage = 50;
         private static bool KFearless = false;
@@ -192,7 +195,6 @@ namespace Hire
         KerbalRoster roster = HighLogic.CurrentGame.CrewRoster;
         private bool hTest = true;
         private bool hasKredits = true;
-
         private void Awake()
         {
             enabled = false;
@@ -256,91 +258,92 @@ namespace Hire
 
         private void kHire()
         {
-
-            ProtoCrewMember newKerb = HighLogic.CurrentGame.CrewRoster.GetNewKerbal(ProtoCrewMember.KerbalType.Crew);
-
-            switch (KGender) // Sets gender
-            {
-                case 0: newKerb.gender = ProtoCrewMember.Gender.Male; break;
-                case 1: newKerb.gender = ProtoCrewMember.Gender.Female; break;
-                case 2: break;
-                default: break;
-            }
-            string career = "";
-            switch (KCareer) // Sets career
-            {
-                case 0: career = "Pilot"; break;
-                case 1: career = "Scientist"; break;
-                case 2: career = "Engineer"; break;
-                default: break;// throw an error?
-            }
-            // Sets the kerbal's career based on the KCareer switch.
-            KerbalRoster.SetExperienceTrait(newKerb, career);
-
-            Debug.Log("KSI :: KIA MIA Stat is: " + KDead);
-            // Debug.Log("KSI :: " + newKerb.experienceTrait.TypeName + " " + newKerb.name + " has been created in: " + loopcount.ToString() + " loops.");
-            newKerb.rosterStatus = ProtoCrewMember.RosterStatus.Available;
-            newKerb.experience = 0;
-            newKerb.experienceLevel = 0;
-            newKerb.courage = KCourage / 100;
-            newKerb.stupidity = KStupidity / 100;
-            if (KFearless)
-            {
-                newKerb.isBadass = true;
-            }
-            Debug.Log("KSI :: Status set to Available, courage and stupidity set, fearless trait set.");
-
-            if (KLevel == 1)
-            {
-                newKerb.flightLog.AddEntry("Orbit,Kerbin");
-                newKerb.flightLog.AddEntry("Suborbit,Kerbin");
-                newKerb.flightLog.AddEntry("Flight,Kerbin");
-                newKerb.flightLog.AddEntry("Land,Kerbin");
-                newKerb.flightLog.AddEntry("Recover");
-                newKerb.ArchiveFlightLog();
-                newKerb.experience = 2;
-                newKerb.experienceLevel = 1;
-                Debug.Log("KSI :: Level set to 1.");
-            }
-            if (KLevel == 2)
-            {
-                newKerb.flightLog.AddEntry("Orbit,Kerbin");
-                newKerb.flightLog.AddEntry("Suborbit,Kerbin");
-                newKerb.flightLog.AddEntry("Flight,Kerbin");
-                newKerb.flightLog.AddEntry("Land,Kerbin");
-                newKerb.flightLog.AddEntry("Recover");
-                newKerb.flightLog.AddEntry("Flyby,Mun");
-                newKerb.flightLog.AddEntry("Orbit,Mun");
-                newKerb.flightLog.AddEntry("Land,Mun");
-                newKerb.flightLog.AddEntry("Flyby,Minmus");
-                newKerb.flightLog.AddEntry("Orbit,Minmus");
-                newKerb.flightLog.AddEntry("Land,Minmus");
-                newKerb.ArchiveFlightLog();
-                newKerb.experience = 8;
-                newKerb.experienceLevel = 2;
-                Debug.Log("KSI :: Level set to 2.");
-            }
-            if (ACLevel == 5)
-            {
-                newKerb.experience = 9999;
-                newKerb.experienceLevel = 5;
-                Debug.Log("KSI :: Level set to 5 - Non-Career Mode default.");
-            }
-
-
-
-            // Refreshes the AC so that new kerbal shows on the available roster.
-
-
             if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
             {
                 double myFunds = Funding.Instance.Funds;
                 Funding.Instance.AddFunds(-costMath(), TransactionReasons.CrewRecruited);
                 Debug.Log("KSI :: Total Funds removed " + costMath());
             }
-            Debug.Log("KSI :: Hiring Function Completed.");
-            GameEvents.onGUIAstronautComplexDespawn.Fire();  // This fails under the new UI --
+
+            for (int i = 0; i < KBulki; i++)
+            {
+                ProtoCrewMember newKerb = HighLogic.CurrentGame.CrewRoster.GetNewKerbal(ProtoCrewMember.KerbalType.Crew);
+
+                switch (KGender) // Sets gender
+                {
+                    case 0: newKerb.gender = ProtoCrewMember.Gender.Male; break;
+                    case 1: newKerb.gender = ProtoCrewMember.Gender.Female; break;
+                    case 2: break;
+                    default: break;
+                }
+                string career = "";
+                switch (KCareer) // Sets career
+                {
+                    case 0: career = "Pilot"; break;
+                    case 1: career = "Scientist"; break;
+                    case 2: career = "Engineer"; break;
+                    default: break;// throw an error?
+                }
+                // Sets the kerbal's career based on the KCareer switch.
+                KerbalRoster.SetExperienceTrait(newKerb, career);
+
+                // Debug.Log("KSI :: KIA MIA Stat is: " + KDead);
+                // Debug.Log("KSI :: " + newKerb.experienceTrait.TypeName + " " + newKerb.name + " has been created in: " + loopcount.ToString() + " loops.");
+                newKerb.rosterStatus = ProtoCrewMember.RosterStatus.Available;
+                newKerb.experience = 0;
+                newKerb.experienceLevel = 0;
+                newKerb.courage = KCourage / 100;
+                newKerb.stupidity = KStupidity / 100;
+                if (KFearless)
+                {
+                    newKerb.isBadass = true;
+                }
+                // Debug.Log("PSH :: Status set to Available, courage and stupidity set, fearless trait set.");
+
+                if (KLevel == 1)
+                {
+                    newKerb.flightLog.AddEntry("Orbit,Kerbin");
+                    newKerb.flightLog.AddEntry("Suborbit,Kerbin");
+                    newKerb.flightLog.AddEntry("Flight,Kerbin");
+                    newKerb.flightLog.AddEntry("Land,Kerbin");
+                    newKerb.flightLog.AddEntry("Recover");
+                    newKerb.ArchiveFlightLog();
+                    newKerb.experience = 2;
+                    newKerb.experienceLevel = 1;
+                    // Debug.Log("KSI :: Level set to 1.");
+                }
+                if (KLevel == 2)
+                {
+                    newKerb.flightLog.AddEntry("Orbit,Kerbin");
+                    newKerb.flightLog.AddEntry("Suborbit,Kerbin");
+                    newKerb.flightLog.AddEntry("Flight,Kerbin");
+                    newKerb.flightLog.AddEntry("Land,Kerbin");
+                    newKerb.flightLog.AddEntry("Recover");
+                    newKerb.flightLog.AddEntry("Flyby,Mun");
+                    newKerb.flightLog.AddEntry("Orbit,Mun");
+                    newKerb.flightLog.AddEntry("Land,Mun");
+                    newKerb.flightLog.AddEntry("Flyby,Minmus");
+                    newKerb.flightLog.AddEntry("Orbit,Minmus");
+                    newKerb.flightLog.AddEntry("Land,Minmus");
+                    newKerb.ArchiveFlightLog();
+                    newKerb.experience = 8;
+                    newKerb.experienceLevel = 2;
+                    // Debug.Log("KSI :: Level set to 2.");
+                }
+                if (ACLevel == 5)
+                {
+                    newKerb.experience = 9999;
+                    newKerb.experienceLevel = 5;
+                    // Debug.Log("KSI :: Level set to 5 - Non-Career Mode default.");
+                }
+
+
+            }
+                // Refreshes the AC so that new kerbal shows on the available roster.
+            Debug.Log("PSH :: Hiring Function Completed.");
+            GameEvents.onGUIAstronautComplexDespawn.Fire();  
             GameEvents.onGUIAstronautComplexSpawn.Fire();
+            
         }
 
 
@@ -359,7 +362,7 @@ namespace Hire
             DCost = 1 + (KDead * 0.1f);
 
 
-            double currentcost = (basecost - couragecost - stupidcost + fearcost) * (KLevel + 1) * DCost * diffcost;
+            double currentcost = (basecost - couragecost - stupidcost + fearcost) * (KLevel + 1) * DCost * diffcost * KBulki;
             // double finaldouble = (Math.Round(currentcost));
             int finalcost = Convert.ToInt32(currentcost); //Convert.ToInt32(finaldouble);
             return finalcost;
@@ -397,6 +400,15 @@ namespace Hire
                 }
             }
             return bText;
+        }
+
+        private int cbulktest()
+        {
+            if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
+            {
+                crewWeCanHire = Mathf.Clamp(GameVariables.Instance.GetActiveCrewLimit(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.AstronautComplex)) - HighLogic.CurrentGame.CrewRoster.GetActiveCrewCount(), 0, 10);
+            }
+            return crewWeCanHire;
         }
 
         private void dCheck()
@@ -455,10 +467,22 @@ namespace Hire
                 // Career selection
                 GUILayout.BeginVertical("box");
                 KCareer = GUILayout.Toolbar(KCareer, KCareerStrings);
-                GUILayout.Label("Pilots can use SAS and ships at vector markers.");
-                GUILayout.Label("Scientists can reset experiements and science gains.");
-                GUILayout.Label("Engineers help drills, repack chutes and fix some items.");
-                GUILayout.Label("Note: Some mods give additional effects to some careers.");
+                // Adding a section for 'number/bulk hire' here using the int array kBulk 
+                if (cbulktest() < 1)
+                {
+                    GUILayout.Label("Bulk hire Option: You can not hire any more kerbals at this time!");
+                }
+                else
+                {
+                    GUILayout.Label("Bulk hire Selector: " + KBulki);
+                    KBulk = GUILayout.HorizontalSlider(KBulk, 1, cbulktest());
+                    KBulki = Convert.ToInt32(KBulk);
+
+                }
+                //GUILayout.Label("Pilots can use SAS and ships at vector markers.");
+                //GUILayout.Label("Scientists can reset experiements and science gains.");
+                //GUILayout.Label("Engineers help drills, repack chutes and fix some items.");
+                //GUILayout.Label("Note: Some mods give additional effects to some careers.");
                 GUI.contentColor = basecolor;
                 GUILayout.EndVertical();
 
