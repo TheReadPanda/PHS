@@ -166,10 +166,10 @@ namespace Hire
         private Rect _areaRect = new Rect(-500f, -500f, 200f, 200f);
         private Vector2 _guiScalar = Vector2.one;
         private Vector2 _guiPivot = Vector2.zero;
-        private GUIStyle _backgroundStyle; // the background of the whole area our GUI will cover
-        private GUIStyle _scrollviewStyle; // style of the whole scrollview
-        private GUIStyle _nameStyle; // style used for kerbal names
-        private GUIStyle _listItemEntryStyle; // style used for background of each kerbal entry
+        //private GUIStyle _backgroundStyle; // the background of the whole area our GUI will cover
+        //private GUIStyle _scrollviewStyle; // style of the whole scrollview
+        //private GUIStyle _nameStyle; // style used for kerbal names
+        //private GUIStyle _listItemEntryStyle; // style used for background of each kerbal entry
         private float KBulk = 1;
         private int KBulki = 1;
         private int crewWeCanHire = 10;
@@ -195,45 +195,47 @@ namespace Hire
         KerbalRoster roster = HighLogic.CurrentGame.CrewRoster;
         private bool hTest = true;
         private bool hasKredits = true;
-        private void Awake()
-        {
-            enabled = false;
-            _backgroundStyle = new GUIStyle(HighLogic.Skin.window)
-            {
-                padding = new RectOffset(),
-                border = new RectOffset()
-            };
 
-            _scrollviewStyle = new GUIStyle(HighLogic.Skin.scrollView)
-            {
-                padding = new RectOffset(),
-                border = new RectOffset()
-            };
 
-            _nameStyle = new GUIStyle(HighLogic.Skin.label);
-            _nameStyle.fontSize = (int)(_nameStyle.fontSize * 1.6);
-            _nameStyle.fontStyle = FontStyle.Bold;
+        //private void Awake()
+        //{
+        //    enabled = false;
+        //    _backgroundStyle = new GUIStyle(HighLogic.Skin.window)
+        //    {
+        //        padding = new RectOffset(),
+        //        border = new RectOffset()
+        //    };
 
-            // set up a style that will cause the moused over entry to highlight itself. Makes the UI feel a little more
-            // interactive
-            _listItemEntryStyle = new GUIStyle(HighLogic.Skin.box);
+        //    _scrollviewStyle = new GUIStyle(HighLogic.Skin.scrollView)
+        //    {
+        //        padding = new RectOffset(),
+        //        border = new RectOffset()
+        //    };
 
-            var clone = Instantiate(_listItemEntryStyle.normal.background);
-            var pixels = clone.GetPixels32();
+        //    _nameStyle = new GUIStyle(HighLogic.Skin.label);
+        //    _nameStyle.fontSize = (int)(_nameStyle.fontSize * 1.6);
+        //    _nameStyle.fontStyle = FontStyle.Bold;
 
-            // poor man's lighting algorithm
-            for (int i = 0; i < pixels.Length; ++i)
-                pixels[i] = new Color32(
-                    Math.Min((byte)255, (byte)(pixels[i].r + 25)),
-                    Math.Min((byte)255, (byte)(pixels[i].g + 25)),
-                    Math.Min((byte)255, (byte)(pixels[i].b + 25)),
-                    Math.Min((byte)255, (byte)(pixels[i].a + 25)));
+        //    // set up a style that will cause the moused over entry to highlight itself. Makes the UI feel a little more
+        //    // interactive
+        //    _listItemEntryStyle = new GUIStyle(HighLogic.Skin.box);
 
-            clone.SetPixels32(pixels);
-            clone.Apply();
+        //    var clone = Instantiate(_listItemEntryStyle.normal.background);
+        //    var pixels = clone.GetPixels32();
 
-            _listItemEntryStyle.hover.background = clone;
-        }
+        //    // poor man's lighting algorithm
+        //    for (int i = 0; i < pixels.Length; ++i)
+        //        pixels[i] = new Color32(
+        //            Math.Min((byte)255, (byte)(pixels[i].r + 25)),
+        //            Math.Min((byte)255, (byte)(pixels[i].g + 25)),
+        //            Math.Min((byte)255, (byte)(pixels[i].b + 25)),
+        //            Math.Min((byte)255, (byte)(pixels[i].a + 25)));
+
+        //    clone.SetPixels32(pixels);
+        //    clone.Apply();
+
+        //    _listItemEntryStyle.hover.background = clone;
+        //}
 
 
         public void Initialize(Rect guiRect)
@@ -436,6 +438,7 @@ namespace Hire
 
         private void OnGUI()
         {
+
             GUI.skin = HighLogic.Skin;
             var roster = HighLogic.CurrentGame.CrewRoster;
             GUIContent[] KGendArray = new GUIContent[3] { KMale, KFemale, KGRandom};
@@ -447,7 +450,7 @@ namespace Hire
             if (HighLogic.CurrentGame.Mode == Game.Modes.SCIENCE_SANDBOX)
             {
                 hasKredits = false;
-                ACLevel = 1;
+                ACLevel = 5;
             }
             if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
             {
@@ -479,10 +482,7 @@ namespace Hire
                     KBulki = Convert.ToInt32(KBulk);
 
                 }
-                //GUILayout.Label("Pilots can use SAS and ships at vector markers.");
-                //GUILayout.Label("Scientists can reset experiements and science gains.");
-                //GUILayout.Label("Engineers help drills, repack chutes and fix some items.");
-                //GUILayout.Label("Note: Some mods give additional effects to some careers.");
+
                 GUI.contentColor = basecolor;
                 GUILayout.EndVertical();
 
