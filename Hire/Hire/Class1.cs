@@ -4,6 +4,7 @@ using KSP.UI;
 using KSP.UI.Screens;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 
 
@@ -47,7 +48,22 @@ namespace Hire
                 panel.GetComponentsInChildren<VerticalLayoutGroup>(true).ToList().ForEach(Destroy);
                 panel.GetComponentsInChildren<ContentSizeFitter>(true).ToList().ForEach(Destroy);
 
+
+                List<UIList> uiListList = panel.GetComponentsInChildren<UIList>(true).ToList();
+                foreach(UIList uiList in uiListList)
+                {
+                    if(uiList.gameObject.name.Equals("scrollList_applicants"))
+                    {
+                        
+                        uiList.SetActive(false);
+                    }
+                }
+                //UIList - scrollList_applicants
                 // Hide all the other children
+
+                
+
+
                 foreach (Transform ch in testVL.transform)
                     ch.gameObject.SetActive(false);
 
