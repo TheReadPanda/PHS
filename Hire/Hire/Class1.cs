@@ -4,6 +4,7 @@ using KSP.UI;
 using KSP.UI.Screens;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 
 
@@ -47,7 +48,6 @@ namespace Hire
                 panel.GetComponentsInChildren<VerticalLayoutGroup>(true).ToList().ForEach(Destroy);
                 panel.GetComponentsInChildren<ContentSizeFitter>(true).ToList().ForEach(Destroy);
 
-                // Hide all the other children
                 foreach (Transform ch in testVL.transform)
                     ch.gameObject.SetActive(false);
 
@@ -195,47 +195,7 @@ namespace Hire
         KerbalRoster roster = HighLogic.CurrentGame.CrewRoster;
         private bool hTest = true;
         private bool hasKredits = true;
-
-
-        //private void Awake()
-        //{
-        //    enabled = false;
-        //    _backgroundStyle = new GUIStyle(HighLogic.Skin.window)
-        //    {
-        //        padding = new RectOffset(),
-        //        border = new RectOffset()
-        //    };
-
-        //    _scrollviewStyle = new GUIStyle(HighLogic.Skin.scrollView)
-        //    {
-        //        padding = new RectOffset(),
-        //        border = new RectOffset()
-        //    };
-
-        //    _nameStyle = new GUIStyle(HighLogic.Skin.label);
-        //    _nameStyle.fontSize = (int)(_nameStyle.fontSize * 1.6);
-        //    _nameStyle.fontStyle = FontStyle.Bold;
-
-        //    // set up a style that will cause the moused over entry to highlight itself. Makes the UI feel a little more
-        //    // interactive
-        //    _listItemEntryStyle = new GUIStyle(HighLogic.Skin.box);
-
-        //    var clone = Instantiate(_listItemEntryStyle.normal.background);
-        //    var pixels = clone.GetPixels32();
-
-        //    // poor man's lighting algorithm
-        //    for (int i = 0; i < pixels.Length; ++i)
-        //        pixels[i] = new Color32(
-        //            Math.Min((byte)255, (byte)(pixels[i].r + 25)),
-        //            Math.Min((byte)255, (byte)(pixels[i].g + 25)),
-        //            Math.Min((byte)255, (byte)(pixels[i].b + 25)),
-        //            Math.Min((byte)255, (byte)(pixels[i].a + 25)));
-
-        //    clone.SetPixels32(pixels);
-        //    clone.Apply();
-
-        //    _listItemEntryStyle.hover.background = clone;
-        //}
+        private bool kerExp = HighLogic.CurrentGame.Parameters.CustomParams<GameParameters.AdvancedParams>().KerbalExperienceEnabled(HighLogic.CurrentGame.Mode);
 
 
         public void Initialize(Rect guiRect)
@@ -332,11 +292,11 @@ namespace Hire
                     newKerb.experienceLevel = 2;
                     // Debug.Log("KSI :: Level set to 2.");
                 }
-                if (ACLevel == 5)
+                if (ACLevel == 5 || kerExp == false)
                 {
                     newKerb.experience = 9999;
                     newKerb.experienceLevel = 5;
-                    // Debug.Log("KSI :: Level set to 5 - Non-Career Mode default.");
+                    Debug.Log("KSI :: Level set to 5 - Non-Career Mode default.");
                 }
 
 
@@ -503,17 +463,24 @@ namespace Hire
                 GUILayout.Label("Select Your Level:");
 
                 // If statements for level options
-                if (ACLevel == 0) { KLevel = GUILayout.Toolbar(KLevel, KLevelStringsZero); }
-                if (ACLevel == 0.5) { KLevel = GUILayout.Toolbar(KLevel, KLevelStringsOne); }
-                if (ACLevel == 1) { KLevel = GUILayout.Toolbar(KLevel, KLevelStringsTwo); }
-                if (ACLevel == 5) { GUILayout.Label("Level 5 - Manditory for Sandbox or Science Mode."); }
+                if (kerExp == false)
+                {
+                    GUILayout.Label("Level 5 - Mandatory for Career with no EXP enabled.");
+                }
+                else
+                {
+                    if (ACLevel == 0) { KLevel = GUILayout.Toolbar(KLevel, KLevelStringsZero); }
+                    if (ACLevel == 0.5) { KLevel = GUILayout.Toolbar(KLevel, KLevelStringsOne); }
+                    if (ACLevel == 1) { KLevel = GUILayout.Toolbar(KLevel, KLevelStringsTwo); }
+                    if (ACLevel == 5) { GUILayout.Label("Level 5 - Mandatory for Sandbox or Science Mode."); }
+                }
                 GUILayout.EndVertical();
 
                 if (hasKredits == true)
                 {
                     GUILayout.BeginHorizontal("window");
                     GUILayout.BeginVertical();
-                    GUILayout.FlexibleSpace();
+                    //GUILayout.FlexibleSpace();
                     if (costMath() <= Funding.Instance.Funds)
                     {
                         GUILayout.Label("Cost: " + costMath(), HighLogic.Skin.textField);
@@ -524,7 +491,7 @@ namespace Hire
                         GUILayout.Label("Insufficient Funds - Cost: " + costMath(), HighLogic.Skin.textField);
                         GUI.color = basecolor;
                     }
-                    GUILayout.FlexibleSpace();
+                    // GUILayout.FlexibleSpace();
                     GUILayout.EndVertical();
                     GUILayout.EndHorizontal();
                 }
@@ -547,7 +514,18 @@ namespace Hire
                 GUILayout.EndArea();
             }
         }
-
+        void Update()
+        {
+            AstronautComplex ac = GameObject.FindObjectOfType<AstronautComplex>();
+            if(ac!=null)
+            {
+                if(ac.ScrollListApplicants.Count>0)
+                {
+                    Debug.Log("TRP: Clearing Applicant List");
+                    ac.ScrollListApplicants.Clear(true);
+                }
+            }
+        }
     }
     
 }
