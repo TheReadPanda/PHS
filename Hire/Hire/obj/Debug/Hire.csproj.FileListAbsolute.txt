@@ -15,3 +15,4 @@ E:\PHS\Hire\Hire\obj\Debug\Hire.dll
 E:\PHS\Hire\Hire\obj\Debug\Hire.pdb
 E:\PHS\Hire\Hire\bin\Debug\UnityScript.Lang.dll
 E:\PHS\Hire\Hire\bin\Debug\Boo.Lang.dll
+E:\PHS\Hire\Hire\obj\Debug\Hire.csprojResolveAssemblyReference.cache
